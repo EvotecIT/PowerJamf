@@ -1,0 +1,130 @@
+﻿Clear-Host
+Import-Module "C:\Support\GitHub\PSPublishModule\PSPublishModule.psd1" -Force
+
+$Configuration = @{
+    Options = @{
+        Signing = @{
+            CertificateThumbprint = '36A8A2D0E227D81A2D3B60DCE0CFCF23BEFC343B'
+        }
+    }
+    Steps   = @{
+        BuildModule   = @{  # requires Enable to be on to process all of that
+            Enable                  = $true
+            DeleteBefore            = $false
+            Merge                   = $true
+            MergeMissing            = $true
+            SignMerged              = $true
+            #CreateFileCatalog       = $false
+            Releases                = $true
+            #ReleasesUnpacked        = $false
+            ReleasesUnpacked        = @{
+                Enabled         = $false
+                IncludeTagName  = $false
+                Path            = "$PSScriptRoot\..\Artefacts"
+                RequiredModules = $false
+                DirectoryOutput = @{
+
+                }
+                FilesOutput     = @{
+
+                }
+            }
+            RefreshPSD1Only         = $false
+            # only when there are classes
+            ClassesDotSource        = $false
+            LibrarySeparateFile     = $false
+            LibraryDotSource        = $false
+            # Applicable only for non-merge/publish situation
+            # It's simply to make life easier during debugging
+            # It makes all functions/aliases exportable
+            UseWildcardForFunctions = $false
+
+            # special features for binary modules
+            DebugDLL                = $false
+            ResolveBinaryConflicts  = $false # mostly for memory and other libraries
+            # ResolveBinaryConflicts  = @{
+            #     ProjectName = 'ImagePlayground.PowerShell'
+            # }
+            LocalVersion            = $false # bumps version in PSD1 on every build
+        }
+        ImportModules = @{
+            Self            = $true
+            RequiredModules = $false
+            Verbose         = $false
+        }
+        PublishModule = @{  # requires Enable to be on to process all of that
+            Enabled      = $false
+            Prerelease   = ''
+            RequireForce = $false
+            GitHub       = $false
+        }
+    }
+}
+
+New-PrepareModule -ModuleName 'PowerJamf' -Configuration $Configuration {
+    # Usual defaults as per standard module
+    $Manifest = [ordered] @{
+        ModuleVersion          = '0.0.X'
+        CompatiblePSEditions   = @('Desktop', 'Core')
+        GUID                   = 'bcbc98de-69f9-4579-89e7-b5807932eb7e'
+        Author                 = 'Przemyslaw Klys'
+        CompanyName            = 'Evotec'
+        Copyright              = "(c) 2011 - $((Get-Date).Year) Przemyslaw Klys @ Evotec. All rights reserved."
+        Description            = 'PowerJamf is a PowerShell module for Jamf Pro.'
+        PowerShellVersion      = '5.1'
+        Tags                   = @('Windows', 'MacOS', 'Linux')
+        #IconUri                = 'https://evotec.xyz/wp-content/uploads/2019/02/PSPublishModule.png'
+        ProjectUri             = 'https://github.com/EvotecIT/PowerJamf'
+        DotNetFrameworkVersion = '4.5.2'
+    }
+    New-ConfigurationManifest @Manifest
+
+    New-ConfigurationModules -Type ExternalModule -Name 'Microsoft.PowerShell.Utility'
+
+    New-ConfigurationModules -Type ApprovedModule -Name 'PSSharedGoods', 'PSWriteColor', 'Connectimo', 'PSUnifi', 'PSWebToolbox', 'PSMyPassword'
+
+    $ConfigurationFormat = [ordered] @{
+        RemoveComments                              = $false
+
+        PlaceOpenBraceEnable                        = $true
+        PlaceOpenBraceOnSameLine                    = $true
+        PlaceOpenBraceNewLineAfter                  = $true
+        PlaceOpenBraceIgnoreOneLineBlock            = $false
+
+        PlaceCloseBraceEnable                       = $true
+        PlaceCloseBraceNewLineAfter                 = $true
+        PlaceCloseBraceIgnoreOneLineBlock           = $false
+        PlaceCloseBraceNoEmptyLineBefore            = $true
+
+        UseConsistentIndentationEnable              = $true
+        UseConsistentIndentationKind                = 'space'
+        UseConsistentIndentationPipelineIndentation = 'IncreaseIndentationAfterEveryPipeline'
+        UseConsistentIndentationIndentationSize     = 4
+
+        UseConsistentWhitespaceEnable               = $true
+        UseConsistentWhitespaceCheckInnerBrace      = $true
+        UseConsistentWhitespaceCheckOpenBrace       = $true
+        UseConsistentWhitespaceCheckOpenParen       = $true
+        UseConsistentWhitespaceCheckOperator        = $true
+        UseConsistentWhitespaceCheckPipe            = $true
+        UseConsistentWhitespaceCheckSeparator       = $true
+
+        AlignAssignmentStatementEnable              = $true
+        AlignAssignmentStatementCheckHashtable      = $true
+
+        UseCorrectCasingEnable                      = $true
+    }
+    # format PSD1 and PSM1 files when merging into a single file
+    # enable formatting is not required as Configuration is provided
+    New-ConfigurationFormat -ApplyTo 'OnMergePSM1', 'OnMergePSD1' -Sort None @ConfigurationFormat
+    # format PSD1 and PSM1 files within the module
+    # enable formatting is required to make sure that formatting is applied (with default settings)
+    New-ConfigurationFormat -ApplyTo 'DefaultPSD1', 'DefaultPSM1' -EnableFormatting -Sort None
+    # when creating PSD1 use special style without comments and with only required parameters
+    New-ConfigurationFormat -ApplyTo 'DefaultPSD1', 'OnMergePSD1' -PSD1Style 'Minimal'
+    # configuration for documentation, at the same time it enables documentation processing
+    New-ConfigurationDocumentation -Enable:$false -StartClean -UpdateWhenNew -PathReadme 'Docs\Readme.md' -Path 'Docs'
+    # global options for publishing to github/psgallery
+    New-ConfigurationPublish -Type PowerShellGallery -FilePath 'C:\Support\Important\PowerShellGalleryAPI.txt'
+    New-ConfigurationPublish -Type GitHub -FilePath 'C:\Support\Important\GitHubAPI.txt' -UserName 'EvotecIT'
+}
