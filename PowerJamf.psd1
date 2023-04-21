@@ -7,7 +7,7 @@
     Copyright              = '(c) 2011 - 2023 Przemyslaw Klys @ Evotec. All rights reserved.'
     Description            = 'PowerJamf is a PowerShell module for Jamf Pro.'
     DotNetFrameworkVersion = '4.5.2'
-    FunctionsToExport      = @('Connect-Jamf', 'Get-JamfDevices')
+    FunctionsToExport      = @('Connect-Jamf', 'Get-JamfDevice', 'Get-JamfDeviceDetail')
     GUID                   = 'bcbc98de-69f9-4579-89e7-b5807932eb7e'
     ModuleVersion          = '0.0.1'
     PowerShellVersion      = '5.1'
