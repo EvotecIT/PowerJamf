@@ -14,6 +14,7 @@
     PrivateData            = @{
         PSData = @{
             Tags                       = @('Windows', 'MacOS', 'Linux')
+            IconUri                    = 'https://resources.jamf.com/images/icons/jamf-og-image.jpg'
             ProjectUri                 = 'https://github.com/EvotecIT/PowerJamf'
             ExternalModuleDependencies = @('Microsoft.PowerShell.Utility')
         }
