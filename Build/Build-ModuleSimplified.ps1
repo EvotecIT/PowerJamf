@@ -1,70 +1,10 @@
 ﻿Clear-Host
 Import-Module "C:\Support\GitHub\PSPublishModule\PSPublishModule.psd1" -Force
 
-$Configuration = @{
-    Options = @{
-        Signing = @{
-            CertificateThumbprint = '36A8A2D0E227D81A2D3B60DCE0CFCF23BEFC343B'
-        }
-    }
-    Steps   = @{
-        BuildModule   = @{  # requires Enable to be on to process all of that
-            Enable                  = $true
-            DeleteBefore            = $false
-            Merge                   = $true
-            MergeMissing            = $true
-            SignMerged              = $true
-            #CreateFileCatalog       = $false
-            Releases                = $true
-            #ReleasesUnpacked        = $false
-            ReleasesUnpacked        = @{
-                Enabled         = $false
-                IncludeTagName  = $false
-                Path            = "$PSScriptRoot\..\Artefacts"
-                RequiredModules = $false
-                DirectoryOutput = @{
-
-                }
-                FilesOutput     = @{
-
-                }
-            }
-            RefreshPSD1Only         = $false
-            # only when there are classes
-            ClassesDotSource        = $false
-            LibrarySeparateFile     = $false
-            LibraryDotSource        = $false
-            # Applicable only for non-merge/publish situation
-            # It's simply to make life easier during debugging
-            # It makes all functions/aliases exportable
-            UseWildcardForFunctions = $false
-
-            # special features for binary modules
-            DebugDLL                = $false
-            ResolveBinaryConflicts  = $false # mostly for memory and other libraries
-            # ResolveBinaryConflicts  = @{
-            #     ProjectName = 'ImagePlayground.PowerShell'
-            # }
-            LocalVersion            = $false # bumps version in PSD1 on every build
-        }
-        ImportModules = @{
-            Self            = $true
-            RequiredModules = $false
-            Verbose         = $false
-        }
-        PublishModule = @{  # requires Enable to be on to process all of that
-            Enabled      = $false
-            Prerelease   = ''
-            RequireForce = $false
-            GitHub       = $false
-        }
-    }
-}
-
-New-PrepareModule -ModuleName 'PowerJamf' -Configuration $Configuration {
+New-PrepareModule -ModuleName 'PowerJamf' {
     # Usual defaults as per standard module
     $Manifest = [ordered] @{
-        ModuleVersion          = '0.0.X'
+        ModuleVersion          = '0.X.0'
         CompatiblePSEditions   = @('Desktop', 'Core')
         GUID                   = 'bcbc98de-69f9-4579-89e7-b5807932eb7e'
         Author                 = 'Przemyslaw Klys'
@@ -73,15 +13,15 @@ New-PrepareModule -ModuleName 'PowerJamf' -Configuration $Configuration {
         Description            = 'PowerJamf is a PowerShell module for Jamf Pro.'
         PowerShellVersion      = '5.1'
         Tags                   = @('Windows', 'MacOS', 'Linux')
-        #IconUri                = 'https://evotec.xyz/wp-content/uploads/2019/02/PSPublishModule.png'
+        IconUri                = 'https://resources.jamf.com/images/icons/jamf-og-image.jpg'
         ProjectUri             = 'https://github.com/EvotecIT/PowerJamf'
         DotNetFrameworkVersion = '4.5.2'
     }
     New-ConfigurationManifest @Manifest
 
-    New-ConfigurationModules -Type ExternalModule -Name 'Microsoft.PowerShell.Utility'
+    New-ConfigurationModule -Type ExternalModule -Name 'Microsoft.PowerShell.Utility'
 
-    New-ConfigurationModules -Type ApprovedModule -Name 'PSSharedGoods', 'PSWriteColor', 'Connectimo', 'PSUnifi', 'PSWebToolbox', 'PSMyPassword'
+    New-ConfigurationModule -Type ApprovedModule -Name 'PSSharedGoods', 'PSWriteColor', 'Connectimo', 'PSUnifi', 'PSWebToolbox', 'PSMyPassword'
 
     $ConfigurationFormat = [ordered] @{
         RemoveComments                              = $false
@@ -124,7 +64,15 @@ New-PrepareModule -ModuleName 'PowerJamf' -Configuration $Configuration {
     New-ConfigurationFormat -ApplyTo 'DefaultPSD1', 'OnMergePSD1' -PSD1Style 'Minimal'
     # configuration for documentation, at the same time it enables documentation processing
     New-ConfigurationDocumentation -Enable:$false -StartClean -UpdateWhenNew -PathReadme 'Docs\Readme.md' -Path 'Docs'
+
+    New-ConfigurationImportModule -ImportSelf
+
+    New-ConfigurationBuild -Enable:$true -SignModule -MergeModuleOnBuild -MergeFunctionsFromApprovedModules -CertificateThumbprint '36A8A2D0E227D81A2D3B60DCE0CFCF23BEFC343B'
+
+    New-ConfigurationArtefact -Type Unpacked -Enable -Path "$PSScriptRoot\..\Artefacts\Unpacked" -ModulesPath "$PSScriptRoot\..\Artefacts\Unpacked\Modules" -RequiredModulesPath "$PSScriptRoot\..\Artefacts\Unpacked\Modules" -AddRequiredModules
+    New-ConfigurationArtefact -Type Packed -Enable -Path "$PSScriptRoot\..\Artefacts\Packed" -ArtefactName '<ModuleName>.v<ModuleVersion>.zip'
+
     # global options for publishing to github/psgallery
-    New-ConfigurationPublish -Type PowerShellGallery -FilePath 'C:\Support\Important\PowerShellGalleryAPI.txt'
-    New-ConfigurationPublish -Type GitHub -FilePath 'C:\Support\Important\GitHubAPI.txt' -UserName 'EvotecIT'
+    New-ConfigurationPublish -Type PowerShellGallery -FilePath 'C:\Support\Important\PowerShellGalleryAPI.txt' -Enabled:$false
+    New-ConfigurationPublish -Type GitHub -FilePath 'C:\Support\Important\GitHubAPI.txt' -UserName 'EvotecIT' -Enabled:$false
 }
