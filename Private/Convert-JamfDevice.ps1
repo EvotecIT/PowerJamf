@@ -4,6 +4,14 @@
         [PSCustomObject[]] $Devices
     )
     foreach ($Device in $Devices) {
+        if ($Device.General.lastContactTime) {
+            $LastContactTime = [DateTime]::Parse($Device.General.lastContactTime)
+            $lastContactTImeDays = [int]((Get-Date) - [DateTime]::Parse($Device.General.lastContactTime)).TotalDays
+        } else {
+            $LastContactTime = $null
+            $lastContactTImeDays = $null
+        }
+
         $ConvertedDevice = [ordered] @{
             Id                                   = $Device.id
             Udid                                 = $Device.udid
@@ -11,7 +19,8 @@
             lastIpAddress                        = $Device.General.lastIpAddress
             lastReportedIp                       = $Device.General.lastReportedIp
             jamfBinaryVersion                    = $Device.General.jamfBinaryVersion
-            lastContactTime                      = if ($Device.General.lastContactTime) { [DateTime]::Parse($Device.General.lastContactTime) } else { $null }
+            lastContactTime                      = $LastContactTime
+            lastContactTImeDays                  = $lastContactTImeDays
             lastCloudBackupDate                  = if ($Device.General.lastCloudBackupDate) { [DateTime]::Parse($Device.General.lastCloudBackupDate) } else { $null }
             lastEnrolledDate                     = if ($Device.General.lastEnrolledDate) { [DateTime]::Parse($Device.General.lastEnrolledDate) } else { $null }
             mdmProfileExpiration                 = if ($Device.General.mdmProfileExpiration) { [DateTime]::Parse($Device.General.mdmProfileExpiration) } else { $null }
@@ -21,7 +30,7 @@
             remoteManagementUserName             = $Device.General.remoteManagement.managementUsername
             supervised                           = $Device.General.supervised
             mdmCapable                           = $Device.General.mdmCapable.capable
-            mdmCapableCapableUsers               = $Device.General.mdmCapable.capableUsers
+            mdmCapableUsers                      = $Device.General.mdmCapable.capableUsers
             reportDate                           = if ($Device.General.reportDate) { [DateTime]::Parse($Device.General.reportDate) } else { $null }
             distributionPoint                    = $Device.General.distributionPoint
             siteId                               = $Device.General.site.id
