@@ -10,7 +10,7 @@ New-PrepareModule -ModuleName 'PowerJamf' {
         Author                 = 'Przemyslaw Klys'
         CompanyName            = 'Evotec'
         Copyright              = "(c) 2011 - $((Get-Date).Year) Przemyslaw Klys @ Evotec. All rights reserved."
-        Description            = 'PowerJamf is a PowerShell module for Jamf Pro.'
+        Description            = 'PowerJamf is an unofficial PowerShell module for Jamf Pro.'
         PowerShellVersion      = '5.1'
         Tags                   = @('Windows', 'MacOS', 'Linux')
         IconUri                = 'https://resources.jamf.com/images/icons/jamf-og-image.jpg'
