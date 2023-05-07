@@ -20,7 +20,7 @@ function Connect-Jamf {
     )
 
     # Check for curent token
-    $CurrentTime = (Get-Date).AddSeconds(-10).ToUniversalTime()
+    $CurrentTime = (Get-Date).AddSeconds(-20).ToUniversalTime()
     if ($Script:JamfTokenInformation.expires -lt $CurrentTime -or $Force) {
         if ($ExistingToken) {
             Write-Verbose -Message "Connect-Jamf - Using existing token within command"
