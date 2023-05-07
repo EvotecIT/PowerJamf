@@ -2,15 +2,22 @@
 function Connect-Jamf {
     [CmdletBinding(DefaultParameterSetName = 'UserName')]
     param(
+        [Parameter(Mandatory, ParameterSetName = 'PasswordEncrypted')]
         [Parameter(Mandatory, ParameterSetName = 'UserName' )]
         [Parameter(Mandatory, ParameterSetName = 'Credential' )]
         [string] $Organization,
-        [Parameter(Mandatory, ParameterSetName = 'UserName')][string] $UserName,
-        [Parameter(Mandatory, ParameterSetName = 'UserName')] [securestring] $Password,
+        [Parameter(Mandatory, ParameterSetName = 'PasswordEncrypted')]
+        [Parameter(Mandatory, ParameterSetName = 'UserName')]
+        [string] $UserName,
+        [Parameter(Mandatory, ParameterSetName = 'UserName')][securestring] $Password,
+        [Parameter(Mandatory, ParameterSetName = 'PasswordEncrypted')][string] $PasswordEncrypted,
+
         [Parameter(Mandatory, ParameterSetName = 'Credential')][pscredential] $Credential,
+        [Parameter(ParameterSetName = 'PasswordEncrypted')]
         [Parameter(ParameterSetName = 'UserName')]
         [Parameter(ParameterSetName = 'Credential')]
         [switch] $Suppress,
+        [Parameter(ParameterSetName = 'PasswordEncrypted')]
         [Parameter(ParameterSetName = 'UserName')]
         [Parameter(ParameterSetName = 'Credential')]
         [Parameter(DontShow, ParameterSetName = 'ExistingToken')]
@@ -33,6 +40,9 @@ function Connect-Jamf {
                 $ConvertedPassword = $Credential.GetNetworkCredential().Password
             } elseif ($UserName -and $Password) {
                 $ConvertedPassword = [System.Net.NetworkCredential]::new("", $Password).Password
+            } elseif ($UserName -and $PasswordEncrypted) {
+                $ConvertedPasswordSecure = ConvertTo-SecureString -String $PasswordEncrypted -Force
+                $ConvertedPassword = [System.Net.NetworkCredential]::new("", $ConvertedPasswordSecure).Password
             } else {
                 return
             }
