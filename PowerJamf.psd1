@@ -9,7 +9,7 @@
     DotNetFrameworkVersion = '4.5.2'
     FunctionsToExport      = @('Connect-Jamf', 'Get-JamfDevice', 'Get-JamfDeviceDetail')
     GUID                   = 'bcbc98de-69f9-4579-89e7-b5807932eb7e'
-    ModuleVersion          = '0.1.0'
+    ModuleVersion          = '0.2.0'
     PowerShellVersion      = '5.1'
     PrivateData            = @{
         PSData = @{
