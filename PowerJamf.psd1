@@ -1,4 +1,4 @@
-﻿@{
+@{
     AliasesToExport        = @()
     Author                 = 'Przemyslaw Klys'
     CmdletsToExport        = @()
@@ -9,16 +9,16 @@
     DotNetFrameworkVersion = '4.5.2'
     FunctionsToExport      = @('Connect-Jamf', 'Get-JamfDevice', 'Get-JamfDeviceDetail')
     GUID                   = 'bcbc98de-69f9-4579-89e7-b5807932eb7e'
-    ModuleVersion          = '0.2.0'
+    ModuleVersion          = '0.3.0'
     PowerShellVersion      = '5.1'
     PrivateData            = @{
         PSData = @{
-            Tags                       = @('Windows', 'MacOS', 'Linux')
+            ExternalModuleDependencies = @('Microsoft.PowerShell.Utility', 'Microsoft.PowerShell.Security')
             IconUri                    = 'https://resources.jamf.com/images/icons/jamf-og-image.jpg'
             ProjectUri                 = 'https://github.com/EvotecIT/PowerJamf'
-            ExternalModuleDependencies = @('Microsoft.PowerShell.Utility')
+            Tags                       = @('Windows', 'MacOS', 'Linux')
         }
     }
-    RequiredModules        = @('Microsoft.PowerShell.Utility')
+    RequiredModules        = @('Microsoft.PowerShell.Utility', 'Microsoft.PowerShell.Security')
     RootModule             = 'PowerJamf.psm1'
 }
